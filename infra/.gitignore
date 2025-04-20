@@ -1,0 +1,6 @@
+# Ignorar los archivos generados por Terraform
+.terraform/
+terraform-provider-azurerm_v4.26.0_x5.exe
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
