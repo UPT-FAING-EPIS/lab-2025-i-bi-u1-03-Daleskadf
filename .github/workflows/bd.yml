@@ -66,12 +66,14 @@ jobs:
 
     - name: Upload Backup to Azure Blob Storage
       run: |
-        az storage blob upload `
-          --account-name ${{ env.STORAGE_ACCOUNT }} `
-          --container-name ${{ env.CONTAINER_NAME }} `
-          --name ${{ env.BACKUP_FILE_PATH }} `
-          --file ${{ env.BACKUP_FILE_PATH }} `
-          --auth-mode login
+        az storage blob upload \
+          --account-name ${{ env.STORAGE_ACCOUNT }} \
+          --container-name ${{ env.CONTAINER_NAME }} \
+          --name ${{ env.BACKUP_FILE_PATH }} \
+          --file ${{ env.BACKUP_FILE_PATH }} \
+          --auth-mode key \
+          --account-key ${{ secrets.AZURE_STORAGE_KEY }} # Si usas account-key
+      
 
     - name: Restore Database from Backup
       run: |
