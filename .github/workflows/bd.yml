@@ -82,6 +82,7 @@ jobs:
           --name ${{ env.BACKUP_FILE_PATH }} `
           --file ${{ env.BACKUP_FILE_PATH }} `
           --auth-mode login
+          --overwrite true
       shell: pwsh
       env:
         RESOURCE_GROUP: rg-powerbi-lab
