@@ -44,9 +44,7 @@ jobs:
       with:
         server-name: ${{ env.SQL_SERVER }}.database.windows.net
         connection-string: "Server=tcp:${{ env.SQL_SERVER }}.database.windows.net,1433;Database=${{ env.SQL_DATABASE }};User ID=${{ env.SQL_USER }};Password=${{ env.SQL_PASSWORD }};Encrypt=true;TrustServerCertificate=false;Connection Timeout=30;"
-        firewall-rule-name: GitHubActionsIP
-        start-ip-address: ${{ github.runner_ip }}
-        end-ip-address: ${{ github.runner_ip }}
+  
 
     - name: Upload Backup to Azure Blob Storage
       run: |
