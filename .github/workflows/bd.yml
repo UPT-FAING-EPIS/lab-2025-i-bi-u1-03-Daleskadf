@@ -1,4 +1,4 @@
-name: Deploy Azure SQL and Restore Database
+name: Deploy Azure SQL and Execute Script
 
 on:
   push:
@@ -11,9 +11,7 @@ env:
   SQL_DATABASE: MyBD
   SQL_USER: sqladmin
   SQL_PASSWORD: Fervillanueva_118  # Asegúrate de que este sea seguro (usa GitHub Secrets en producción)
-  BACKUP_FILE_PATH: AdventureWorksLT2016.bak  # Nombre del archivo de respaldo que quieres restaurar
-  STORAGE_ACCOUNT: dalesstorage123  # Actualiza esto a la nueva cuenta de almacenamiento
-  CONTAINER_NAME: backups
+  SQL_SCRIPT_PATH: ./BD.sql  # Ruta del archivo BD.sql
 
 jobs:
   deploy:
@@ -39,7 +37,7 @@ jobs:
         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
-    - name: Azure Login (using Service Principal for blob upload)
+    - name: Azure Login (using Service Principal for SQL access)
       run: |
         az login --service-principal -u ${{ secrets.ARM_CLIENT_ID }} -p ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
       shell: pwsh
@@ -60,40 +58,18 @@ jobs:
         SQL_DATABASE: MyBD
         SQL_USER: sqladmin
         SQL_PASSWORD: Fervillanueva_118
-        BACKUP_FILE_PATH: AdventureWorksLT2016.bak
-        STORAGE_ACCOUNT: ${{ env.STORAGE_ACCOUNT }}
-        CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
 
-    - name: Create Blob Storage Container (if it doesn't exist)
+    - name: Execute SQL Script to Create Database and Populate Data
       run: |
-        az storage container create `
-          --name ${{ env.CONTAINER_NAME }} `
-          --account-name ${{ env.STORAGE_ACCOUNT }} `
-          --auth-mode login
+        az sql db create `
+          --resource-group ${{ env.RESOURCE_GROUP }} `
+          --server ${{ env.SQL_SERVER }} `
+          --name ${{ env.SQL_DATABASE }} `
+          --edition GeneralPurpose `
+          --compute-model Provisioned `
+          --license-type LicenseIncluded `
+          --max-size 5GB
+        sqlcmd -S tcp:${{ env.SQL_SERVER }}.database.windows.net,1433 -d ${{ env.SQL_DATABASE }} -U ${{ env.SQL_USER }} -P ${{ env.SQL_PASSWORD }} -i ${{ env.SQL_SCRIPT_PATH }}
       shell: pwsh
       env:
-        STORAGE_ACCOUNT: ${{ env.STORAGE_ACCOUNT }}
-
-    - name: Upload Backup to Azure Blob Storage
-      run: |
-        az storage blob upload `
-          --account-name ${{ env.STORAGE_ACCOUNT }} `
-          --container-name ${{ env.CONTAINER_NAME }} `
-          --name ${{ env.BACKUP_FILE_PATH }} `
-          --file ${{ env.BACKUP_FILE_PATH }} `
-          --auth-mode login `
-          --overwrite true
-      shell: pwsh
-      env:
-        RESOURCE_GROUP: rg-powerbi-lab
-        SQL_SERVER: sqlserverpowerbilab
-        SQL_DATABASE: MyBD
-        SQL_USER: sqladmin
-        SQL_PASSWORD: Fervillanueva_118
-        BACKUP_FILE_PATH: AdventureWorksLT2016.bak
-        STORAGE_ACCOUNT: ${{ env.STORAGE_ACCOUNT }}
-        CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
-
-    - name: Restore Database from Backup
-      run: |
-        az sql db restore --resource-group rg-powerbi-lab --server sqlserverpowerbilab --dest-name MyBD --backup-path "https://dalesstorage123.blob.core.windows.net/backups/AdventureWorksLT2016.bak" --backup-storage-redundancy GeoRedundant
+        SQL_SCRIPT_PATH: ./BD.sql
