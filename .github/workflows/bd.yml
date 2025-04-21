@@ -45,8 +45,8 @@ jobs:
           --resource-group ${{ env.RESOURCE_GROUP }} \
           --server ${{ env.SQL_SERVER }} \
           --name GitHubActionsIP \
-          --start-ip-address ${{ github.runner_ip }} \
-          --end-ip-address ${{ github.runner_ip }}
+          --start-ip-address $(curl ifconfig.me) \
+          --end-ip-address $(curl ifconfig.me)
       shell: pwsh
       env:
         RESOURCE_GROUP: rg-powerbi-lab
