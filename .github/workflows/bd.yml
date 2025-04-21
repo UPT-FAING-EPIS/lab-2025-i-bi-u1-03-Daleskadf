@@ -39,10 +39,10 @@ jobs:
         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
-    - name: Azure Login (using Service Principal)
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Azure Login (using Service Principal for blob upload)
+      run: |
+        az login --service-principal -u ${{ secrets.ARM_CLIENT_ID }} -p ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
+      shell: pwsh
 
     - name: Configure SQL Firewall (using Azure CLI)
       run: |
@@ -63,11 +63,6 @@ jobs:
         BACKUP_FILE_PATH: AdventureWorksLT2016.bak
         STORAGE_ACCOUNT: mystorageaccount
         CONTAINER_NAME: backups
-
-    - name: Azure Login (using Service Principal for blob upload)
-      run: |
-        az login --service-principal -u ${{ secrets.ARM_CLIENT_ID }} -p ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
-      shell: pwsh
 
     - name: Upload Backup to Azure Blob Storage
       run: |
