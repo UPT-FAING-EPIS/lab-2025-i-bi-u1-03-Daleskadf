@@ -2,9 +2,6 @@
 CREATE DATABASE SalesDB;
 GO
 
--- Select the database
-USE SalesDB;
-
 -- Create the Products table
 CREATE TABLE Products (
     ProductID INT PRIMARY KEY,

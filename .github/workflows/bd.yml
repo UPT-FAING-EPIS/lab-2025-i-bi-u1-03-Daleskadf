@@ -73,3 +73,4 @@ jobs:
       shell: pwsh
       env:
         SQL_SCRIPT_PATH: ./BD.sql
+        
