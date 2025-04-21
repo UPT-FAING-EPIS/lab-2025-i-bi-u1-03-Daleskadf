@@ -96,4 +96,4 @@ jobs:
 
     - name: Restore Database from Backup
       run: |
-        az sql db restore --resource-group rg-powerbi-lab --server sqlserverpowerbilab --dest-name MyBD --backup-url "https://dalesstorage123.blob.core.windows.net/backups/AdventureWorksLT2016.bak" --backup-storage-redundancy GeoRedundant
+        az sql db restore --resource-group rg-powerbi-lab --server sqlserverpowerbilab --dest-name MyBD --backup-path "https://dalesstorage123.blob.core.windows.net/backups/AdventureWorksLT2016.bak" --backup-storage-redundancy GeoRedundant
