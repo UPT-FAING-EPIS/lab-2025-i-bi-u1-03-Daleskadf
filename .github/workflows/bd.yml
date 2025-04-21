@@ -99,7 +99,7 @@ jobs:
         az sql db restore `
           --resource-group ${{ env.RESOURCE_GROUP }} `
           --server ${{ env.SQL_SERVER }} `
-          --dest-name ${{ env.SQL_DATABASE }} ` 
+          --dest-name ${{ env.SQL_DATABASE }} `
           --backup-name ${{ env.BACKUP_FILE_PATH }} `
           --storage-account ${{ env.STORAGE_ACCOUNT }} `
           --container-name ${{ env.CONTAINER_NAME }} `
