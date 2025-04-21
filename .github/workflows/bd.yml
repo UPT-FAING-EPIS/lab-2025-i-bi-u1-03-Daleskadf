@@ -96,6 +96,21 @@ jobs:
 
     - name: Restore Database from Backup
       run: |
-        az sql db restore --resource-group ${{ env.RESOURCE_GROUP }} \server ${{ env.SQL_SERVER }} \dest-name ${{ env.SQL_DATABASE }} \backup-name ${{ env.BACKUP_FILE_PATH }} \storage-account ${{ env.STORAGE_ACCOUNT }} \container-name ${{ env.CONTAINER_NAME }} \backup-storage-redundancy GeoRedundant
-
+        az sql db restore \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --server ${{ env.SQL_SERVER }} \
+          --dest-name ${{ env.SQL_DATABASE }} \
+          --backup-url "https://${{ env.STORAGE_ACCOUNT }}.blob.core.windows.net/${{ env.CONTAINER_NAME }}/${{ env.BACKUP_FILE_PATH }}" \
+          --backup-storage-redundancy GeoRedundant
+      shell: pwsh
+      env:
+        RESOURCE_GROUP: rg-powerbi-lab
+        SQL_SERVER: sqlserverpowerbilab
+        SQL_DATABASE: MyBD
+        SQL_USER: sqladmin
+        SQL_PASSWORD: Fervillanueva_118
+        BACKUP_FILE_PATH: AdventureWorksLT2016.bak
+        STORAGE_ACCOUNT: dalesstorage123
+        CONTAINER_NAME: backups
+      
       
