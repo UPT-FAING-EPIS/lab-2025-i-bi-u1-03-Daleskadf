@@ -81,7 +81,7 @@ jobs:
           --container-name ${{ env.CONTAINER_NAME }} `
           --name ${{ env.BACKUP_FILE_PATH }} `
           --file ${{ env.BACKUP_FILE_PATH }} `
-          --auth-mode login
+          --auth-mode login `
           --overwrite true
       shell: pwsh
       env:
