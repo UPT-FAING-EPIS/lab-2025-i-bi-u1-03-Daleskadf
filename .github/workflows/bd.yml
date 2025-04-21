@@ -8,7 +8,7 @@ on:
 env:
   RESOURCE_GROUP: rg-powerbi-lab
   SQL_SERVER: sqlserverpowerbilab
-  SQL_DATABASE: MyBD
+  SQL_DATABASE: SalesBD
   SQL_USER: sqladmin
   SQL_PASSWORD: Fervillanueva_118  # Asegúrate de que este sea seguro (usa GitHub Secrets en producción)
   SQL_SCRIPT_PATH: ./BD.sql  # Ruta del archivo BD.sql
@@ -55,7 +55,7 @@ jobs:
       env:
         RESOURCE_GROUP: rg-powerbi-lab
         SQL_SERVER: sqlserverpowerbilab
-        SQL_DATABASE: MyBD
+        SQL_DATABASE: SalesBD
         SQL_USER: sqladmin
         SQL_PASSWORD: Fervillanueva_118
 
@@ -73,4 +73,4 @@ jobs:
       shell: pwsh
       env:
         SQL_SCRIPT_PATH: ./BD.sql
-        
+
