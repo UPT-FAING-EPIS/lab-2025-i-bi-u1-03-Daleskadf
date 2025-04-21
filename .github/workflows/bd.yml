@@ -43,7 +43,7 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
+
     - name: Configure SQL Firewall (using Azure CLI)
       run: |
         $IP = $(curl -s ifconfig.me)
@@ -64,6 +64,11 @@ jobs:
         STORAGE_ACCOUNT: mystorageaccount
         CONTAINER_NAME: backups
 
+    - name: Azure Login (using Service Principal for blob upload)
+      run: |
+        az login --service-principal -u ${{ secrets.ARM_CLIENT_ID }} -p ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
+      shell: pwsh
+
     - name: Upload Backup to Azure Blob Storage
       run: |
         az storage blob upload `
@@ -72,8 +77,17 @@ jobs:
           --name ${{ env.BACKUP_FILE_PATH }} `
           --file ${{ env.BACKUP_FILE_PATH }} `
           --auth-mode login
+      shell: pwsh
+      env:
+        RESOURCE_GROUP: rg-powerbi-lab
+        SQL_SERVER: sqlserverpowerbilab
+        SQL_DATABASE: MyBD
+        SQL_USER: sqladmin
+        SQL_PASSWORD: Fervillanueva_118
+        BACKUP_FILE_PATH: AdventureWorksLT2016.bak
+        STORAGE_ACCOUNT: mystorageaccount
+        CONTAINER_NAME: backups
 
-          
     - name: Restore Database from Backup
       run: |
         az sql db restore `
@@ -84,3 +98,13 @@ jobs:
           --storage-account ${{ env.STORAGE_ACCOUNT }} `
           --container-name ${{ env.CONTAINER_NAME }} `
           --backup-path ${{ env.BACKUP_FILE_PATH }}
+      shell: pwsh
+      env:
+        RESOURCE_GROUP: rg-powerbi-lab
+        SQL_SERVER: sqlserverpowerbilab
+        SQL_DATABASE: MyBD
+        SQL_USER: sqladmin
+        SQL_PASSWORD: Fervillanueva_118
+        BACKUP_FILE_PATH: AdventureWorksLT2016.bak
+        STORAGE_ACCOUNT: mystorageaccount
+        CONTAINER_NAME: backups
