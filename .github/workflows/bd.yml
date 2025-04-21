@@ -1,0 +1,69 @@
+name: Deploy Azure SQL and Restore Database
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  RESOURCE_GROUP: rg-powerbi-lab
+  SQL_SERVER: sqlserverpowerbilab
+  SQL_DATABASE: MyBD
+  SQL_USER: sqladmin
+  SQL_PASSWORD: Fervillanueva_118  # Asegúrate de que este sea seguro (usa GitHub Secrets en producción)
+  BACKUP_FILE_PATH: AdventureWorksLT2016.bak  # Nombre del archivo de respaldo que quieres restaurar
+  STORAGE_ACCOUNT: mystorageaccount
+  CONTAINER_NAME: backups
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: infra
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+      working-directory: infra
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+    - name: Configure SQL Firewall
+      uses: azure/sql-action@v1
+      with:
+        server-name: ${{ env.SQL_SERVER }}.database.windows.net
+        connection-string: "Server=tcp:${{ env.SQL_SERVER }}.database.windows.net,1433;Database=${{ env.SQL_DATABASE }};User ID=${{ env.SQL_USER }};Password=${{ env.SQL_PASSWORD }};Encrypt=true;TrustServerCertificate=false;Connection Timeout=30;"
+        firewall-rule-name: GitHubActionsIP
+        start-ip-address: ${{ github.runner_ip }}
+        end-ip-address: ${{ github.runner_ip }}
+
+    - name: Upload Backup to Azure Blob Storage
+      run: |
+        az storage blob upload \
+          --account-name ${{ env.STORAGE_ACCOUNT }} \
+          --container-name ${{ env.CONTAINER_NAME }} \
+          --name ${{ env.BACKUP_FILE_PATH }} \
+          --file ${{ env.BACKUP_FILE_PATH }} \
+          --auth-mode login
+
+    - name: Restore Database from Backup
+      run: |
+        az sql db restore \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --server ${{ env.SQL_SERVER }} \
+          --name ${{ env.SQL_DATABASE }} \
+          --backup-name ${{ env.BACKUP_FILE_PATH }} \
+          --storage-account ${{ env.STORAGE_ACCOUNT }} \
+          --container-name ${{ env.CONTAINER_NAME }} \
+          --backup-path ${{ env.BACKUP_FILE_PATH }}
