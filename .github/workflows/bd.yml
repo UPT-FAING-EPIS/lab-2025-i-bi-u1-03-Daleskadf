@@ -42,11 +42,8 @@ jobs:
     - name: Azure Login (using Service Principal)
       uses: azure/login@v1
       with:
-        client-id: ${{ secrets.ARM_CLIENT_ID }}
-        client-secret: ${{ secrets.ARM_CLIENT_SECRET }}
-        tenant-id: ${{ secrets.ARM_TENANT_ID }}
-        auth-type: SERVICE_PRINCIPAL 
-
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
     - name: Configure SQL Firewall (using Azure CLI)
       run: |
         $IP = $(curl -s ifconfig.me)
