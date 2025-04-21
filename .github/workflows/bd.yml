@@ -59,18 +59,28 @@ jobs:
         SQL_USER: sqladmin
         SQL_PASSWORD: Fervillanueva_118
 
-    - name: Execute SQL Script to Create Database and Populate Data
-      run: |
-        az sql db create `
-          --resource-group ${{ env.RESOURCE_GROUP }} `
-          --server ${{ env.SQL_SERVER }} `
-          --name ${{ env.SQL_DATABASE }} `
-          --edition GeneralPurpose `
-          --compute-model Provisioned `
-          --license-type LicenseIncluded `
-          --max-size 5GB
-        sqlcmd -S tcp:${{ env.SQL_SERVER }}.database.windows.net,1433 -d ${{ env.SQL_DATABASE }} -U ${{ env.SQL_USER }} -P ${{ env.SQL_PASSWORD }} -i ${{ env.SQL_SCRIPT_PATH }}
+    - name: Execute SQL Script on Existing Database
       shell: pwsh
-      env:
-        SQL_SCRIPT_PATH: ./BD.sql
+      run: |
+          Write-Host "Executing SQL script on ${{ env.SQL_SERVER }}..."
+          $exitCode = 0
+          
+          try {
+            sqlcmd -S tcp:${{ env.SQL_SERVER }}.database.windows.net,1433 `
+                   -d ${{ env.SQL_DATABASE }} `
+                   -U ${{ env.SQL_USER }} `
+                   -P "${{ env.SQL_PASSWORD }}" `
+                   -i ${{ env.SQL_SCRIPT_PATH }}
+            $exitCode = $LASTEXITCODE
+          } catch {
+            Write-Error "Error executing SQL script: $_"
+            $exitCode = 1
+          }
+          
+          if ($exitCode -ne 0) {
+            Write-Error "SQL script execution failed with exit code $exitCode"
+            exit $exitCode
+          }
+          
+          Write-Host "SQL script executed successfully on database ${{ env.SQL_DATABASE }}"
 
