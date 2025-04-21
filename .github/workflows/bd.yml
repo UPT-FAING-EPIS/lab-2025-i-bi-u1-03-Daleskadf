@@ -96,7 +96,7 @@ jobs:
 
     - name: Restore Database from Backup
       run: |
-          az sql db restore --resource-group ${{ env.RESOURCE_GROUP }} --server ${{ env.SQL_SERVER }} --dest-name ${{ env.SQL_DATABASE }} --point-in-time "2025-04-21T00:00:00Z" --backup-storage-redundancy GeoRedundant
+          az sql db restore --resource-group ${{ env.RESOURCE_GROUP }} --server ${{ env.SQL_SERVER }} --dest-name ${{ env.SQL_DATABASE }} --backup-storage-redundancy GeoRedundant
       shell: pwsh
       env:
           RESOURCE_GROUP: rg-powerbi-lab
