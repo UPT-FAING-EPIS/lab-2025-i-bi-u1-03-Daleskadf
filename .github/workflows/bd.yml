@@ -12,7 +12,7 @@ env:
   SQL_USER: sqladmin
   SQL_PASSWORD: Fervillanueva_118  # Asegúrate de que este sea seguro (usa GitHub Secrets en producción)
   BACKUP_FILE_PATH: AdventureWorksLT2016.bak  # Nombre del archivo de respaldo que quieres restaurar
-  STORAGE_ACCOUNT: mystorageaccount
+  STORAGE_ACCOUNT: dalesstorage123  # Actualiza esto a la nueva cuenta de almacenamiento
   CONTAINER_NAME: backups
 
 jobs:
@@ -61,8 +61,18 @@ jobs:
         SQL_USER: sqladmin
         SQL_PASSWORD: Fervillanueva_118
         BACKUP_FILE_PATH: AdventureWorksLT2016.bak
-        STORAGE_ACCOUNT: mystorageaccount
-        CONTAINER_NAME: backups
+        STORAGE_ACCOUNT: ${{ env.STORAGE_ACCOUNT }}
+        CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
+
+    - name: Create Blob Storage Container (if it doesn't exist)
+      run: |
+        az storage container create `
+          --name ${{ env.CONTAINER_NAME }} `
+          --account-name ${{ env.STORAGE_ACCOUNT }} `
+          --auth-mode login
+      shell: pwsh
+      env:
+        STORAGE_ACCOUNT: ${{ env.STORAGE_ACCOUNT }}
 
     - name: Upload Backup to Azure Blob Storage
       run: |
@@ -80,8 +90,8 @@ jobs:
         SQL_USER: sqladmin
         SQL_PASSWORD: Fervillanueva_118
         BACKUP_FILE_PATH: AdventureWorksLT2016.bak
-        STORAGE_ACCOUNT: mystorageaccount
-        CONTAINER_NAME: backups
+        STORAGE_ACCOUNT: ${{ env.STORAGE_ACCOUNT }}
+        CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
 
     - name: Restore Database from Backup
       run: |
@@ -101,5 +111,5 @@ jobs:
         SQL_USER: sqladmin
         SQL_PASSWORD: Fervillanueva_118
         BACKUP_FILE_PATH: AdventureWorksLT2016.bak
-        STORAGE_ACCOUNT: mystorageaccount
-        CONTAINER_NAME: backups
+        STORAGE_ACCOUNT: ${{ env.STORAGE_ACCOUNT }}
+        CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
