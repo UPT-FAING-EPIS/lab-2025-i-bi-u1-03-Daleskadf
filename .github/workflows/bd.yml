@@ -96,6 +96,6 @@ jobs:
 
     - name: Restore Database from Backup
       run: |
-        az sql db restore --resource-group ${{ env.RESOURCE_GROUP }} \server ${{ env.SQL_SERVER }} \dest-name ${{ env.SQL_DATABASE }} \backup-url "https://${{ env.STORAGE_ACCOUNT }}.blob.core.windows.net/${{ env.CONTAINER_NAME }}/${{ env.BACKUP_FILE_PATH }}" \backup-storage-redundancy GeoRedundant
+        az sql db restore --dest-name ${{ env.SQL_DATABASE }} \resource-group ${{ env.RESOURCE_GROUP }} \server ${{ env.SQL_SERVER }} \backup-url "https://${{ env.STORAGE_ACCOUNT }}.blob.core.windows.net/${{ env.CONTAINER_NAME }}/${{ env.BACKUP_FILE_PATH }}" \backup-storage-redundancy GeoRedundant
 
       
