@@ -73,6 +73,7 @@ jobs:
           --file ${{ env.BACKUP_FILE_PATH }} `
           --auth-mode login
 
+          
     - name: Restore Database from Backup
       run: |
         az sql db restore `
