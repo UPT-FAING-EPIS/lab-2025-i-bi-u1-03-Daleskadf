@@ -21,7 +21,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Deploy .pbix to Power BI
-      uses: nathangiusti/Power-BI-Pipeline-Deploy@v2.5
+      uses: microsoft/powerbi-actions@v1
       with:
         authenticationType: 'ServicePrincipal'
         clientId: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}
